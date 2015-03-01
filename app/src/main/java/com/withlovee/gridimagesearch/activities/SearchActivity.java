@@ -2,8 +2,10 @@ package com.withlovee.gridimagesearch.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -55,7 +57,7 @@ public class SearchActivity extends ActionBarActivity {
 
     private void setupViews(){
         // Listener for Search button
-        final EditText etSearch = (EditText) findViewById(R.id.etSearch);
+        /*final EditText etSearch = (EditText) findViewById(R.id.etSearch);
         etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -66,7 +68,7 @@ public class SearchActivity extends ActionBarActivity {
                 }
                 return false;
             }
-        });
+        });*/
 
         gvResults = (GridView) findViewById(R.id.gvResults);
         gvResults.setOnScrollListener(new EndlessScrollListener() {
@@ -150,7 +152,22 @@ public class SearchActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                Toast.makeText(context, "Searching 2 for " + s + "...", Toast.LENGTH_SHORT).show();
+                searchPhotos(s);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
