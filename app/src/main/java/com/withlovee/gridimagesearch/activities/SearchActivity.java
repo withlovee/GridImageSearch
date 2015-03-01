@@ -41,7 +41,6 @@ public class SearchActivity extends ActionBarActivity {
     private ImageResultsAdapter aImageResults;
     private Context context;
     private String keyword = "Golden Retriever Puppy";
-    private int currentPage = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,29 +55,13 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void setupViews(){
-        // Listener for Search button
-        /*final EditText etSearch = (EditText) findViewById(R.id.etSearch);
-        etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    String searchWord = etSearch.getText().toString();
-                    Toast.makeText(context, "Searching for " + searchWord + "...", Toast.LENGTH_SHORT).show();
-                    searchPhotos(searchWord);
-                }
-                return false;
-            }
-        });*/
 
         gvResults = (GridView) findViewById(R.id.gvResults);
         gvResults.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                Log.i("LOADMORE", page + " " + totalItemsCount);
-                if(page > currentPage){
-                    Log.i("PAGE", page + " " + totalItemsCount);
-                    loadMorePhotos(page);
-                }
+                Log.i("DEBUG", "LOADMORE " + page + " " + totalItemsCount);
+                loadMorePhotos(page);
             }
         });
         gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -86,7 +69,6 @@ public class SearchActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Launch the image display activity
-
                 // Create an intent
                 Intent i = new Intent(SearchActivity.this, ImageDisplayActivity.class);
 
@@ -103,9 +85,8 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void loadMorePhotos(int page){
-        currentPage = page;
         String url = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=" + keyword + "&start=" + ((page-1) * 4);
-        Log.i("DEBUG-APPEND-"+page, url);
+        // Log.i("DEBUG-APPEND-"+page, url);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, null, new JsonHttpResponseHandler(){
             @Override
@@ -113,7 +94,7 @@ public class SearchActivity extends ActionBarActivity {
                 JSONArray imagesJSON = null;
                 try {
                     imagesJSON = response.getJSONObject("responseData").getJSONArray("results");
-                    Log.i("DEBUG-APPEND", imagesJSON.toString());
+                    // Log.i("DEBUG-APPEND", imagesJSON.toString());
                     imageResults.addAll(ImageResult.fromJSONArray(imagesJSON));
                     aImageResults.notifyDataSetChanged();
                 } catch (JSONException e) {
@@ -132,7 +113,6 @@ public class SearchActivity extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray imagesJSON = null;
                 try {
-                    currentPage = 1;
                     imageResults.clear();
                     imagesJSON = response.getJSONObject("responseData").getJSONArray("results");
                     Log.i("DEBUG", imagesJSON.toString());
@@ -141,8 +121,6 @@ public class SearchActivity extends ActionBarActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // loadMorePhotos(2);
-                // loadMorePhotos(3);
             }
         });
     }
@@ -157,7 +135,7 @@ public class SearchActivity extends ActionBarActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                Toast.makeText(context, "Searching 2 for " + s + "...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Searching for " + s + "...", Toast.LENGTH_SHORT).show();
                 searchPhotos(s);
                 return false;
             }
