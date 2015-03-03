@@ -101,12 +101,12 @@ public class SearchActivity extends ActionBarActivity implements SettingDialog.S
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray imagesJSON = null;
-                endlessScrollListener.resetCounter();
+                // endlessScrollListener.resetCounter();
                 try {
                     Log.i("DEBUG-URL", url);
                     imagesJSON = response.getJSONObject("responseData").getJSONArray("results");
                     Log.i("DEBUG", imagesJSON.toString());
-                    imageResults.clear();
+                    aImageResults.clear();
                     imageResults.addAll(ImageResult.fromJSONArray(imagesJSON));
                     aImageResults.notifyDataSetChanged();
                 } catch (JSONException e) {
@@ -118,7 +118,8 @@ public class SearchActivity extends ActionBarActivity implements SettingDialog.S
     }
 
     private void loadMorePhotos(int page){
-        String url = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0" + getSearchSettings() + "&start=" + ((page-1) * 4);
+        if(page > 15) return;
+        String url = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0" + getSearchSettings() + "&start=" + (page * 4);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, null, new JsonHttpResponseHandler(){
             @Override
